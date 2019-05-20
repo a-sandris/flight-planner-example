@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd"
+>
+    <changeSet id="create airports table" author="sandris">
+        <createTable tableName="airports">
+            <column name="airport" type="varchar(255)">
+                <constraints
+                        nullable="false"
+                        primaryKey="true"
+                        primaryKeyName="pk_airports"
+                />
+            </column>
+            <column name="city" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="country" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create flights table" author="sandris">
+        <createSequence sequenceName="flights_seq"/>
+        <createTable tableName="flights">
+            <column
+                    name="id"
+                    type="bigint"
+                    defaultValueSequenceNext="flights_seq"
+            >
+                <constraints
+                        primaryKey="true"
+                        nullable="false"
+                        primaryKeyName="pk_flights"
+                />
+            </column>
+            <column
+                    name="airport_from"
+                    type="varchar(255)"
+            >
+                <constraints nullable="false"/>
+            </column>
+            <column
+                    name="airport_to"
+                    type="varchar(255)"
+            >
+                <constraints nullable="false"/>
+            </column>
+            <column
+                    name="carrier"
+                    type="varchar(255)"
+            >
+                <constraints nullable="false"/>
+            </column>
+            <column
+                    name="departure_time"
+                    type="timestamp without timezone"
+            >
+                <constraints nullable="false"/>
+            </column>
+            <column
+                    name="arrival_time"
+                    type="timestamp without timezone"
+            >
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="flights"
+                baseColumnNames="airport_from"
+                constraintName="fk_flights_airportFrom_airports_airport"
+                referencedTableName="airports"
+                referencedColumnNames="airport"
+                onDelete="CASCADE"
+        />
+        <createIndex
+                tableName="flights"
+                indexName="idx_flights_airportFrom">
+            <column name="airport_from"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+                baseTableName="flights"
+                baseColumnNames="airport_to"
+                constraintName="fk_flights_airportTo_airports_airport"
+                referencedTableName="airports"
+                referencedColumnNames="airport"
+                onDelete="CASCADE"
+        />
+        <createIndex
+                tableName="flights"
+                indexName="idx_flights_airportTo">
+            <column name="airport_to"/>
+        </createIndex>
+
+        <addUniqueConstraint
+                tableName="flights"
+                columnNames="airport_from, airport_to, departure_time, arrival_time, carrier"
+                constraintName="unq_flights_airport_from_airport_to_departure_time_arrival_time_carrier"
+        />
+    </changeSet>
+
+
+</databaseChangeLog>
